@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>로그인 - 아무 말 대잔치</title>
+  <link rel="stylesheet" href="./css/common.css" />
+  <link rel="stylesheet" href="./css/auth.css" />
+</head>
+<body>
+  <header class="page-header auth-page-header">
+    <div class="header-inner">
+      <div class="header-left"></div>
+      <h1 class="service-title">아무 말 대잔치</h1>
+      <div class="header-right"></div>
+    </div>
+  </header>
+
+  <main class="page-main auth-main">
+    <form id="login-form" class="auth-form" novalidate>
+      <h2 class="auth-title">로그인</h2>
+      <div class="form-field">
+        <label for="email">이메일</label>
+        <input id="email" name="email" type="email" placeholder="이메일을 입력하세요." />
+      </div>
+      <div class="form-field">
+        <label for="password">비밀번호</label>
+        <input id="password" name="password" type="password" placeholder="비밀번호를 입력하세요." />
+      </div>
+      <p id="login-helper" class="helper-text" aria-live="polite"></p>
+      <button id="login-button" class="primary-button full-width-button" type="submit" disabled>로그인</button>
+      <a class="auth-link" href="./signup.html">회원가입</a>
+    </form>
+  </main>
+
+  <script src="./js/api.js"></script>
+  <script src="./js/common.js"></script>
+  <script src="./js/login.js"></script>
+</body>
+</html>

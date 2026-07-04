@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>마이페이지 - 아무 말 대잔치</title>
+
+  <link rel="stylesheet" href="./css/common.css" />
+  <link rel="stylesheet" href="./css/mypage.css" />
+</head>
+<body>
+  <header class="page-header">
+    <div class="header-inner">
+      <div class="header-left"></div>
+
+      <h1 class="service-title">아무 말 대잔치</h1>
+
+      <div class="header-right">
+        <div class="profile-menu">
+          <a class="profile-link" href="./mypage.html" aria-label="프로필 메뉴 열기" aria-expanded="false">
+            <img
+              id="header-profile-image"
+              src="./assets/images/default-profile.svg"
+              alt="로그인 사용자 프로필"
+            />
+          </a>
+
+          <nav id="profile-dropdown" class="profile-dropdown" aria-label="프로필 메뉴">
+            <a href="./mypage.html">회원정보수정</a>
+            <a href="./password-edit.html">비밀번호수정</a>
+            <button id="logout-button" type="button">로그아웃</button>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-main mypage-main">
+    <form id="mypage-form" class="mypage-form" novalidate>
+      <h2 class="page-title">회원정보수정</h2>
+
+      <div class="mypage-profile-section">
+        <label class="mypage-profile-label" for="profile-image">
+          프로필 사진*
+        </label>
+
+        <label class="mypage-profile-image-button" for="profile-image">
+          <img
+            id="profile-preview"
+            src="./assets/images/default-profile.svg"
+            alt="프로필 사진 미리보기"
+          />
+          <span class="profile-change-badge">변경</span>
+        </label>
+
+        <input
+          id="profile-image"
+          class="visually-hidden"
+          name="profileImage"
+          type="file"
+          accept="image/*"
+        />
+      </div>
+
+      <div class="mypage-info-field">
+        <label>이메일</label>
+        <p id="email" class="mypage-email" data-bind="user.email">
+          startupcode@gmail.com
+        </p>
+      </div>
+
+      <div class="form-field">
+        <label for="nickname">닉네임</label>
+        <input
+          id="nickname"
+          name="nickname"
+          type="text"
+          value="스타트업코드"
+          data-bind="user.nickname"
+        />
+      </div>
+
+      <p id="mypage-helper" class="helper-text" aria-live="polite">* helper text</p>
+
+      <button id="update-button" class="primary-button full-width-button" type="submit">
+        수정하기
+      </button>
+
+      <button id="delete-user-button" class="text-button withdraw-button" type="button">
+        회원 탈퇴
+      </button>
+
+      <button id="bottom-update-button" class="primary-button complete-button" type="button" hidden>
+        수정완료
+      </button>
+    </form>
+  </main>
+
+  <div id="toast" class="toast-message" role="status" aria-live="polite" hidden>
+    수정 완료
+  </div>
+
+  <div id="withdraw-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="withdraw-modal-title" aria-describedby="withdraw-modal-message" hidden>
+    <div class="confirm-modal">
+      <h2 id="withdraw-modal-title">회원탈퇴 하시겠습니까?</h2>
+      <p id="withdraw-modal-message">확인을 누르면 계정이 삭제됩니다.</p>
+      <div class="confirm-modal-actions">
+        <button id="withdraw-cancel-button" class="modal-button cancel-button" type="button">취소</button>
+        <button id="withdraw-confirm-button" class="modal-button confirm-button" type="button">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./js/api.js"></script>
+  <script src="./js/common.js"></script>
+  <script src="./js/mypage.js"></script>
+</body>
+</html>

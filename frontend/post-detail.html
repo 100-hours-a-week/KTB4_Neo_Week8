@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>게시글 상세 - 아무 말 대잔치</title>
+  <link rel="stylesheet" href="./css/common.css" />
+  <link rel="stylesheet" href="./css/post-detail.css" />
+</head>
+<body>
+  <header class="page-header">
+    <div class="header-inner">
+      <div class="header-left">
+        <button class="back-button" type="button" aria-label="뒤로 가기" data-back-fallback="./post-list.html"></button>
+      </div>
+      <h1 class="service-title">아무 말 대잔치</h1>
+      <div class="header-right">
+        <div class="profile-menu">
+          <a class="profile-link" href="./mypage.html" aria-label="마이페이지로 이동" aria-expanded="false">
+            <img id="header-profile-image" src="./assets/images/default-profile.svg" alt="로그인 사용자 프로필" />
+          </a>
+          <nav id="profile-dropdown" class="profile-dropdown" aria-label="프로필 메뉴">
+            <a href="./mypage.html">회원정보수정</a>
+            <a href="./password-edit.html">비밀번호수정</a>
+            <button id="logout-button" type="button">로그아웃</button>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-main detail-main">
+    <article class="detail-article">
+      <h2 id="post-title" class="detail-title">게시글을 불러오는 중입니다.</h2>
+      <div class="detail-meta">
+        <img id="author-profile-image" class="detail-author-avatar" src="./assets/images/default-profile.svg" alt="작성자 프로필" />
+        <strong id="author-nickname" class="detail-author"></strong>
+        <span id="post-created-at" class="detail-date"></span>
+        <div id="post-owner-actions" class="detail-actions author-only">
+          <button id="edit-button" class="outline-button" type="button">수정</button>
+          <button id="delete-button" class="outline-button" type="button">삭제</button>
+        </div>
+        <button id="report-button" class="outline-button report-button" type="button">신고하기</button>
+      </div>
+      <img id="post-image" class="detail-image" src="./assets/images/default-post.svg" alt="게시글 이미지" />
+      <p id="post-body" class="detail-body"></p>
+      <div class="detail-stats">
+        <button id="like-button" class="stat-button" type="button"><strong id="like-count">0</strong><span>좋아요수</span></button>
+        <button class="stat-button" type="button"><strong id="view-count">0</strong><span>조회수</span></button>
+        <button class="stat-button" type="button"><strong id="comment-count">0</strong><span>댓글</span></button>
+      </div>
+    </article>
+
+    <section class="comment-section">
+      <form id="comment-form" class="comment-form">
+        <textarea id="comment-input" placeholder="댓글을 남겨주세요."></textarea>
+        <div class="comment-submit-row">
+          <button id="comment-submit-button" class="primary-button" type="submit" disabled>댓글 등록</button>
+        </div>
+      </form>
+      <div id="comment-list" class="comment-list"></div>
+    </section>
+  </main>
+
+  <div id="confirm-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title" aria-describedby="confirm-modal-message" hidden>
+    <div class="confirm-modal">
+      <h2 id="confirm-modal-title">삭제하시겠습니까?</h2>
+      <p id="confirm-modal-message">삭제한 내용은 복구할 수 없습니다.</p>
+      <div class="confirm-modal-actions">
+        <button id="modal-cancel-button" class="modal-button cancel-button" type="button">취소</button>
+        <button id="modal-confirm-button" class="modal-button confirm-button" type="button">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="report-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="report-modal-title" hidden>
+    <form id="report-form" class="report-modal">
+      <h2 id="report-modal-title">게시글 신고하기</h2>
+      <p class="report-description">신고 유형을 선택하고 상세 사유를 입력해주세요.</p>
+      <fieldset id="report-type-group" class="report-type-group">
+        <legend>신고 유형</legend>
+      </fieldset>
+      <label class="report-reason-label" for="report-reason">상세 사유</label>
+      <textarea id="report-reason" name="reportReason" placeholder="상세 사유를 입력해주세요."></textarea>
+      <p id="report-helper" class="helper-text" aria-live="polite">* 신고 유형을 선택해주세요.</p>
+      <div class="confirm-modal-actions">
+        <button id="report-cancel-button" class="modal-button cancel-button" type="button">취소</button>
+        <button id="report-submit-button" class="modal-button report-submit-button" type="submit">신고하기</button>
+      </div>
+    </form>
+  </div>
+
+  <script src="./js/api.js"></script>
+  <script src="./js/common.js"></script>
+  <script src="./js/post-detail.js"></script>
+</body>
+</html>

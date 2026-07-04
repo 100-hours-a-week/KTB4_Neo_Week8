@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>게시글 작성 - 아무 말 대잔치</title>
+  <link rel="stylesheet" href="./css/common.css" />
+  <link rel="stylesheet" href="./css/post-form.css" />
+</head>
+<body>
+  <header class="page-header">
+    <div class="header-inner">
+      <div class="header-left">
+        <button class="back-button" type="button" aria-label="뒤로 가기" data-back-fallback="./post-list.html"></button>
+      </div>
+      <h1 class="service-title">아무 말 대잔치</h1>
+      <div class="header-right">
+        <div class="profile-menu">
+          <a class="profile-link" href="./mypage.html" aria-label="프로필 메뉴 열기" aria-expanded="false">
+            <img id="header-profile-image" src="./assets/images/default-profile.svg" alt="로그인 사용자 프로필" />
+          </a>
+          <nav id="profile-dropdown" class="profile-dropdown" aria-label="프로필 메뉴">
+            <a href="./mypage.html">회원정보수정</a>
+            <a href="./password-edit.html">비밀번호수정</a>
+            <button id="logout-button" type="button">로그아웃</button>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-main post-form-main">
+    <form id="post-create-form" class="post-form" novalidate>
+      <h2 class="page-title">게시글 작성</h2>
+      <div class="line-field">
+        <label for="title">제목*</label>
+        <input id="title" name="title" type="text" placeholder="제목을 입력해주세요. (최대 26글자)" maxlength="26" />
+      </div>
+      <div class="line-field">
+        <label for="post-body">내용*</label>
+        <textarea id="post-body" name="postBody" placeholder="내용을 입력해주세요."></textarea>
+      </div>
+      <p id="post-helper" class="helper-text" aria-live="polite">* helper text</p>
+      <div class="form-field image-field">
+        <label for="post-image">이미지</label>
+        <div class="custom-file-row">
+          <label class="custom-file-button" for="post-image">파일 선택</label>
+          <span id="post-image-file-name" class="file-name-text">파일을 선택해주세요.</span>
+          <input id="post-image" class="visually-hidden" name="postImage" type="file" accept="image/*" />
+        </div>
+      </div>
+      <button id="post-submit-button" class="primary-button" type="submit">완료</button>
+    </form>
+  </main>
+
+  <script src="./js/api.js"></script>
+  <script src="./js/common.js"></script>
+  <script src="./js/post-create.js"></script>
+</body>
+</html>

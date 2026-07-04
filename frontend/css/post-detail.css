@@ -1,0 +1,410 @@
+.detail-main {
+    max-width: 544px;
+    padding-top: 24px;
+    padding-bottom: 60px
+}
+
+.detail-article {
+    width: 100%
+}
+
+.detail-title {
+    margin: 0 0 14px;
+    font-size: 24px;
+    font-weight: 700
+}
+
+.detail-meta {
+    border-bottom: 1px solid var(--soft-line);
+    padding-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px
+}
+
+.detail-author-avatar,
+.comment-avatar,
+.reply-avatar {
+    border-radius: 50%;
+    background: #d9d9d9;
+    object-fit: cover
+}
+
+.detail-author-avatar {
+    width: 36px;
+    height: 36px
+}
+
+.detail-author {
+    font-size: 13px;
+    font-weight: 700
+}
+
+.detail-date {
+    font-size: 12px
+}
+
+.detail-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 8px
+}
+
+.report-button {
+    margin-left: 8px;
+    border-color: #ff3b30;
+    background: #ff3b30;
+    color: #fff
+}
+
+.report-button:hover {
+    background: #e22d24
+}
+
+.detail-image {
+    width: 100%;
+    height: 306px;
+    margin: 24px 0;
+    background: #d9d9d9;
+    object-fit: cover;
+    display: block
+}
+
+.detail-body {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.55;
+    white-space: pre-line
+}
+
+.detail-stats {
+    margin: 32px 0;
+    display: flex;
+    justify-content: center;
+    gap: 12px
+}
+
+.stat-button {
+    width: 102px;
+    height: 82px;
+    border: 0;
+    border-radius: 16px;
+    background: #d9d9d9;
+    color: #000;
+    font-size: 15px;
+    font-weight: 700
+}
+
+.stat-button.is-active {
+    background: #aca0eb
+}
+
+.stat-button strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 700
+}
+
+.stat-button span {
+    display: block;
+    margin-top: 4px;
+    font-size: 14px
+}
+
+.comment-section {
+    border-top: 1px solid var(--soft-line);
+    padding-top: 24px
+}
+
+.comment-form {
+    overflow: hidden;
+    margin-bottom: 20px;
+    background: var(--white);
+    border-radius: 12px
+}
+
+.comment-form textarea {
+    width: 100%;
+    height: 92px;
+    border: 0;
+    padding: 20px;
+    resize: none;
+    font-size: 13px
+}
+
+.comment-form textarea:focus {
+    outline: none
+}
+
+.comment-submit-row {
+    height: 45px;
+    border-top: 1px solid var(--soft-line);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 8px
+}
+
+.comment-submit-row .primary-button {
+    width: 110px;
+    height: 32px;
+    border-radius: 16px
+}
+
+.comment-submit-row .primary-button:disabled {
+    background: #7f6aee;
+    cursor: default
+}
+
+.comment-item,
+.reply-item {
+    margin-bottom: 18px
+}
+
+.comment-top,
+.reply-top {
+    display: flex;
+    align-items: center;
+    gap: 10px
+}
+
+.comment-avatar {
+    width: 34px;
+    height: 34px
+}
+
+.comment-author,
+.reply-author {
+    font-size: 13px;
+    font-weight: 700
+}
+
+.comment-date,
+.reply-date {
+    font-size: 12px
+}
+
+.comment-actions,
+.reply-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 8px
+}
+
+.comment-actions:empty,
+.reply-actions:empty {
+    display: none
+}
+
+.comment-body {
+    margin: 8px 0 0 44px;
+    font-size: 13px
+}
+
+.reply-list {
+    margin: 12px 0 0 44px;
+    padding-left: 16px;
+    border-left: 2px solid #e1e1e1
+}
+
+.reply-item {
+    margin-bottom: 12px
+}
+
+.reply-avatar {
+    width: 26px;
+    height: 26px
+}
+
+.reply-body {
+    margin: 6px 0 0 36px;
+    font-size: 12px;
+    color: #333
+}
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px
+}
+
+.modal-backdrop[hidden] {
+    display: none
+}
+
+body.modal-open {
+    overflow: hidden
+}
+
+.confirm-modal {
+    width: 100%;
+    max-width: 464px;
+    min-height: 276px;
+    border-radius: 12px;
+    background: #fff;
+    padding: 56px 32px;
+    text-align: center
+}
+
+.confirm-modal h2 {
+    margin: 0 0 24px;
+    color: #000;
+    font-size: 24px;
+    font-weight: 700
+}
+
+.confirm-modal p {
+    margin: 0 0 30px;
+    color: #000;
+    font-size: 20px;
+    line-height: 1.4
+}
+
+.confirm-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 18px
+}
+
+.modal-button {
+    width: 144px;
+    height: 50px;
+    border: 0;
+    border-radius: 12px;
+    color: #000;
+    font-size: 20px;
+    font-weight: 400
+}
+
+.cancel-button {
+    background: #242424;
+    color: #fff
+}
+
+.confirm-button {
+    background: #c4a5fa
+}
+
+.report-modal {
+    width: 100%;
+    max-width: 464px;
+    border-radius: 12px;
+    background: #fff;
+    padding: 40px 32px;
+    color: #000
+}
+
+.report-modal h2 {
+    margin: 0 0 12px;
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center
+}
+
+.report-description {
+    margin: 0 0 24px;
+    font-size: 14px;
+    line-height: 1.5;
+    text-align: center;
+    color: #555
+}
+
+.report-type-group {
+    margin: 0 0 18px;
+    padding: 0;
+    border: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px
+}
+
+.report-type-group legend,
+.report-reason-label {
+    grid-column: 1 / -1;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 800
+}
+
+.report-type-group label {
+    min-height: 36px;
+    padding: 0 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    cursor: pointer
+}
+
+.report-type-group label:has(input:checked) {
+    border-color: #ff3b30;
+    background: #fff1f0
+}
+
+.report-reason-label {
+    display: block
+}
+
+.report-modal textarea {
+    width: 100%;
+    min-height: 108px;
+    border: 1px solid #777;
+    border-radius: 4px;
+    background: transparent;
+    padding: 10px;
+    resize: vertical;
+    font-size: 13px
+}
+
+.report-modal .helper-text {
+    margin: 6px 0 18px
+}
+
+.report-submit-button {
+    background: #ff3b30;
+    color: #fff
+}
+
+.report-submit-button:hover {
+    background: #e22d24
+}
+
+@media(max-width:640px) {
+    .detail-meta,
+    .comment-top,
+    .reply-top {
+        flex-wrap: wrap
+    }
+
+    .detail-actions,
+    .comment-actions,
+    .reply-actions {
+        width: 100%;
+        margin-left: 44px
+    }
+
+    .confirm-modal {
+        min-height: 240px;
+        padding: 42px 24px
+    }
+
+    .confirm-modal h2 {
+        font-size: 20px
+    }
+
+    .confirm-modal p,
+    .modal-button {
+        font-size: 16px
+    }
+
+    .modal-button {
+        width: 120px
+    }
+}

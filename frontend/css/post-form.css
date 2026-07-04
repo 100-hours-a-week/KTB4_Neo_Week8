@@ -1,0 +1,77 @@
+.post-form-main {
+  padding-top: 24px;
+}
+
+.post-form {
+  width: 100%;
+  max-width: 392px;
+  margin: 0 auto;
+}
+
+.post-form .page-title {
+  margin-bottom: 36px;
+}
+
+.line-field {
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #dddddd;
+}
+
+.line-field label {
+  display: block;
+  margin-bottom: 0;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #dddddd;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.line-field input,
+.line-field textarea {
+  display: block;
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 14px 0 0;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.line-field input {
+  min-height: 36px;
+}
+
+.line-field textarea {
+  min-height: 184px;
+  resize: none;
+}
+
+.post-edit-form .line-field textarea {
+  min-height: 240px;
+  resize: vertical;
+}
+
+.line-field input:focus,
+.line-field textarea:focus {
+  outline: none;
+}
+
+.post-form .helper-text {
+  margin: -10px 0 8px;
+}
+
+.image-field {
+  margin-top: 0;
+  margin-bottom: 24px;
+}
+
+.post-form .custom-file-row {
+  margin: 8px 0 24px;
+}
+
+.post-form .primary-button {
+  width: 276px;
+  margin: 0 auto;
+  display: flex;
+}
