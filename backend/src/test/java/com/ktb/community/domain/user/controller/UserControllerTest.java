@@ -1,6 +1,7 @@
 package com.ktb.community.domain.user.controller;
 
 import com.ktb.community.domain.user.dto.LoginResponseDto;
+import com.ktb.community.domain.user.dto.UserResponseDto;
 import com.ktb.community.domain.user.dto.RefreshTokenResponseDto;
 import com.ktb.community.domain.user.dto.SignUpResponseDto;
 import com.ktb.community.domain.user.service.UserService;
@@ -16,15 +17,21 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.context.annotation.Import;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -41,6 +48,9 @@ class UserControllerTest {
 
     @MockitoBean
     private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private UserController userController;
 
     @Test
     @DisplayName("회원가입 성공 시 201과 userId를 응답한다")
@@ -151,4 +161,74 @@ class UserControllerTest {
 
         verify(userService).refreshAccessToken(null);
     }
+
+    @Test
+    @DisplayName("로그아웃 성공 시 204와 refreshToken 삭제 쿠키를 응답한다")
+    void logout_success_deletesRefreshTokenCookie() {
+        // when
+        ResponseEntity<Void> response = userController.logout(userDetails());
+
+        // then
+        assertThat(response.getStatusCode().value()).isEqualTo(204);
+        assertThat(response.getHeaders().getFirst(HttpHeaders.SET_COOKIE))
+                .contains("refreshToken=", "Max-Age=0", "HttpOnly", "Path=/");
+        verify(userService).logout("test@example.com");
+    }
+
+    @Test
+    @DisplayName("마이페이지 조회 성공 시 유저 정보를 응답한다")
+    void getMyPage_success_returnsUser() {
+        // given
+        given(userService.getMyPage("test@example.com", 1L))
+                .willReturn(new UserResponseDto(1L, "neo", "test@example.com", "/profile.png"));
+
+        // when
+        ResponseEntity<?> response = userController.getMyPage(userDetails(), 1L);
+
+        // then
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        verify(userService).getMyPage("test@example.com", 1L);
+    }
+
+    @Test
+    @DisplayName("회원 정보 수정 성공 시 성공 메시지를 응답한다")
+    void updateUser_success_returnsOk() {
+        // when
+        ResponseEntity<?> response = userController.updateUser(userDetails(), 1L, null);
+
+        // then
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        verify(userService).updateUser("test@example.com", 1L, null);
+    }
+
+    @Test
+    @DisplayName("비밀번호 수정 성공 시 성공 메시지를 응답한다")
+    void updatePassword_success_returnsOk() {
+        // when
+        ResponseEntity<?> response = userController.updatePassword(userDetails(), 1L, null);
+
+        // then
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        verify(userService).updatePassword("test@example.com", 1L, null);
+    }
+
+    @Test
+    @DisplayName("회원 탈퇴 성공 시 true를 응답한다")
+    void deleteUser_success_returnsTrue() {
+        // when
+        ResponseEntity<?> response = userController.deleteUser(userDetails(), 1L);
+
+        // then
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        verify(userService).deleteUser("test@example.com", 1L);
+    }
+
+    private UserDetails userDetails() {
+        return org.springframework.security.core.userdetails.User
+                .withUsername("test@example.com")
+                .password("password")
+                .roles("USER")
+                .build();
+    }
+
 }

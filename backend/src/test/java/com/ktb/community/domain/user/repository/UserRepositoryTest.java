@@ -99,4 +99,37 @@ public class UserRepositoryTest {
         assertThatThrownBy(() -> userRepository.save(user2))
                 .isInstanceOf(DataIntegrityViolationException.class);
     }
+
+    @Test
+    @DisplayName("저장된 이메일이면 true를 반환한다")
+    void existsByEmail_existingEmail_returnsTrue() {
+        // given
+        userRepository.save(new User(
+                "test@example.com",
+                "encoded-password",
+                "neo",
+                "/profile.png"
+        ));
+
+        // when & then
+        assertThat(userRepository.existsByEmail("test@example.com")).isTrue();
+        assertThat(userRepository.existsByEmail("none@example.com")).isFalse();
+    }
+
+    @Test
+    @DisplayName("저장된 닉네임이면 true를 반환한다")
+    void existsByNickname_existingNickname_returnsTrue() {
+        // given
+        userRepository.save(new User(
+                "test@example.com",
+                "encoded-password",
+                "neo",
+                "/profile.png"
+        ));
+
+        // when & then
+        assertThat(userRepository.existsByNickname("neo")).isTrue();
+        assertThat(userRepository.existsByNickname("unknown")).isFalse();
+    }
+
 }

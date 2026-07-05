@@ -2,8 +2,12 @@ package com.ktb.community.domain.user.service;
 
 import com.ktb.community.domain.user.dto.LoginRequestDto;
 import com.ktb.community.domain.user.dto.LoginResponseDto;
+import com.ktb.community.domain.user.dto.PasswordUpdateRequestDto;
+import com.ktb.community.domain.user.dto.RefreshTokenResponseDto;
 import com.ktb.community.domain.user.dto.SignUpRequestDto;
 import com.ktb.community.domain.user.dto.SignUpResponseDto;
+import com.ktb.community.domain.user.dto.UserResponseDto;
+import com.ktb.community.domain.user.dto.UserUpdateRequestDto;
 import com.ktb.community.domain.user.entity.RefreshToken;
 import com.ktb.community.domain.user.entity.User;
 import com.ktb.community.domain.user.repository.RefreshTokenRepository;
@@ -31,6 +35,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.doThrow;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -320,6 +325,306 @@ class UserServiceTest {
                     .extracting("errorCode")
                     .isEqualTo(ErrorCode.UNAUTHORIZED_USER);
         }
+        @Test
+        @DisplayName("회원 탈퇴 처리 직전 이미 삭제 상태면 실패한다")
+        void deleteUser_alreadyDeletedBeforeDelete_throwsAlreadyDeleted() {
+            // given
+            User user = org.mockito.Mockito.mock(User.class);
+
+            given(userRepository.findByEmail("test@example.com")).willReturn(Optional.of(user));
+            given(user.isDeleted()).willReturn(false, true);
+            given(user.getUserId()).willReturn(1L);
+
+            // when & then
+            assertThatThrownBy(() -> userService.deleteUser("test@example.com", 1L))
+                    .isInstanceOf(ApiException.class)
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.ALREADY_DELETED);
+
+            verify(user, never()).delete();
+        }
+
+    }
+
+
+    @Nested
+    @DisplayName("로그아웃")
+    class Logout {
+
+        @Test
+        @DisplayName("로그아웃 성공 시 refreshToken을 삭제한다")
+        void logout_success() {
+            // given
+            User user = user(1L, "test@example.com", "encoded-password", "neo", "/profile.png");
+            given(userRepository.findByEmail("test@example.com")).willReturn(Optional.of(user));
+
+            // when
+            userService.logout("test@example.com");
+
+            // then
+            verify(refreshTokenRepository).deleteByUser(user);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 유저면 로그아웃에 실패한다")
+        void logout_userNotFound_throwsUnauthorizedUser() {
+            // given
+            given(userRepository.findByEmail("test@example.com")).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> userService.logout("test@example.com"))
+                    .isInstanceOf(ApiException.class)
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.UNAUTHORIZED_USER);
+
+            verify(refreshTokenRepository, never()).deleteByUser(any());
+        }
+    }
+
+    @Nested
+    @DisplayName("마이페이지 조회")
+    class GetMyPage {
+
+        @Test
+        @DisplayName("본인 마이페이지 조회에 성공한다")
+        void getMyPage_success() {
+            // given
+            User user = user(1L, "test@example.com", "encoded-password", "neo", "/profile.png");
+            given(userRepository.findByEmail("test@example.com")).willReturn(Optional.of(user));
+
+            // when
+            UserResponseDto response = userService.getMyPage("test@example.com", 1L);
+
+            // then
+            assertThat(response.getUserId()).isEqualTo(1L);
+            assertThat(response.getEmail()).isEqualTo("test@example.com");
+            assertThat(response.getNickname()).isEqualTo("neo");
+            assertThat(response.getProfileImage()).isEqualTo("/profile.png");
+        }
+
+        @Test
+        @DisplayName("본인이 아니면 마이페이지 조회에 실패한다")
+        void getMyPage_notOwner_throwsDeniedAccess() {
+            // given
+            User user = user(1L, "test@example.com", "encoded-password", "neo", "/profile.png");
+            given(userRepository.findByEmail("test@example.com")).willReturn(Optional.of(user));
+
+            // when & then
+            assertThatThrownBy(() -> userService.getMyPage("test@example.com", 2L))
+                    .isInstanceOf(ApiException.class)
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.DENIED_ACCESS);
+        }
+    }
+
+    @Nested
+    @DisplayName("회원 정보 수정")
+    class UpdateUser {
+
+        @Test
+        @DisplayName("회원 정보 수정에 성공한다")
+        void updateUser_success() {
+            // given
+            User user = user(1L, "test@example.com", "encoded-password", "neo", "/profile.png");
+            UserUpdateRequestDto request = userUpdateRequest("new-neo", "/new-profile.png");
+            given(userRepository.findByEmail("test@example.com")).willReturn(Optional.of(user));
+
+            // when
+            userService.updateUser("test@example.com", 1L, request);
+
+            // then
+            assertThat(user.getNickname()).isEqualTo("new-neo");
+            assertThat(user.getProfileImage()).isEqualTo("/new-profile.png");
+        }
+
+        @Test
+        @DisplayName("본인이 아니면 회원 정보 수정에 실패한다")
+        void updateUser_notOwner_throwsDeniedAccess() {
+            // given
+            User user = user(1L, "test@example.com", "encoded-password", "neo", "/profile.png");
+            UserUpdateRequestDto request = userUpdateRequest("new-neo", "/new-profile.png");
+            given(userRepository.findByEmail("test@example.com")).willReturn(Optional.of(user));
+
+            // when & then
+            assertThatThrownBy(() -> userService.updateUser("test@example.com", 2L, request))
+                    .isInstanceOf(ApiException.class)
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.DENIED_ACCESS);
+
+            assertThat(user.getNickname()).isEqualTo("neo");
+        }
+    }
+
+    @Nested
+    @DisplayName("비밀번호 수정")
+    class UpdatePassword {
+
+        @Test
+        @DisplayName("비밀번호 수정에 성공한다")
+        void updatePassword_success() {
+            // given
+            User user = user(1L, "test@example.com", "encoded-password", "neo", "/profile.png");
+            PasswordUpdateRequestDto request = passwordUpdateRequest("OldPassword123!", "NewPassword123!", "NewPassword123!");
+            given(userRepository.findByEmail("test@example.com")).willReturn(Optional.of(user));
+            given(passwordEncoder.matches("OldPassword123!", "encoded-password")).willReturn(true);
+            given(passwordEncoder.encode("NewPassword123!")).willReturn("new-encoded-password");
+
+            // when
+            userService.updatePassword("test@example.com", 1L, request);
+
+            // then
+            assertThat(user.getPassword()).isEqualTo("new-encoded-password");
+        }
+
+        @Test
+        @DisplayName("새 비밀번호 확인이 일치하지 않으면 실패한다")
+        void updatePassword_passwordMismatch_throwsPasswordMismatch() {
+            // given
+            User user = user(1L, "test@example.com", "encoded-password", "neo", "/profile.png");
+            PasswordUpdateRequestDto request = passwordUpdateRequest("OldPassword123!", "NewPassword123!", "Different123!");
+            given(userRepository.findByEmail("test@example.com")).willReturn(Optional.of(user));
+
+            // when & then
+            assertThatThrownBy(() -> userService.updatePassword("test@example.com", 1L, request))
+                    .isInstanceOf(ApiException.class)
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.PASSWORD_MISMATCH);
+
+            verify(passwordEncoder, never()).matches(any(), any());
+        }
+
+        @Test
+        @DisplayName("현재 비밀번호가 일치하지 않으면 실패한다")
+        void updatePassword_wrongCurrentPassword_throwsInvalidPassword() {
+            // given
+            User user = user(1L, "test@example.com", "encoded-password", "neo", "/profile.png");
+            PasswordUpdateRequestDto request = passwordUpdateRequest("WrongPassword123!", "NewPassword123!", "NewPassword123!");
+            given(userRepository.findByEmail("test@example.com")).willReturn(Optional.of(user));
+            given(passwordEncoder.matches("WrongPassword123!", "encoded-password")).willReturn(false);
+
+            // when & then
+            assertThatThrownBy(() -> userService.updatePassword("test@example.com", 1L, request))
+                    .isInstanceOf(ApiException.class)
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.INVALID_PASSWORD);
+
+            verify(passwordEncoder, never()).encode(any());
+        }
+    }
+
+    @Nested
+    @DisplayName("accessToken 재발급")
+    class RefreshAccessToken {
+
+        @Test
+        @DisplayName("정상 refreshToken이면 새 accessToken을 반환한다")
+        void refreshAccessToken_success() {
+            // given
+            User user = user(1L, "test@example.com", "encoded-password", "neo", "/profile.png");
+            RefreshToken refreshToken = new RefreshToken(user, "refresh-token", LocalDateTime.now().plusDays(1));
+
+            given(refreshTokenRepository.findByToken("refresh-token")).willReturn(Optional.of(refreshToken));
+            given(jwtTokenProvider.createAccessToken(user)).willReturn("new-access-token");
+
+            // when
+            RefreshTokenResponseDto response = userService.refreshAccessToken("refresh-token");
+
+            // then
+            assertThat(response.getAccessToken()).isEqualTo("new-access-token");
+            verify(jwtTokenProvider).validateRefreshTokenOrThrow("refresh-token");
+            verify(refreshTokenRepository, never()).delete(any(RefreshToken.class));
+        }
+
+        @Test
+        @DisplayName("refreshToken이 null이면 실패한다")
+        void refreshAccessToken_null_throwsRefreshTokenNotFound() {
+            assertThatThrownBy(() -> userService.refreshAccessToken(null))
+                    .isInstanceOf(ApiException.class)
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
+
+            verify(refreshTokenRepository, never()).findByToken(any());
+        }
+
+        @Test
+        @DisplayName("refreshToken이 공백이면 실패한다")
+        void refreshAccessToken_blank_throwsRefreshTokenNotFound() {
+            assertThatThrownBy(() -> userService.refreshAccessToken("  "))
+                    .isInstanceOf(ApiException.class)
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
+
+            verify(refreshTokenRepository, never()).findByToken(any());
+        }
+
+        @Test
+        @DisplayName("DB에 refreshToken이 없으면 실패한다")
+        void refreshAccessToken_notFound_throwsInvalidRefreshToken() {
+            // given
+            given(refreshTokenRepository.findByToken("refresh-token")).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> userService.refreshAccessToken("refresh-token"))
+                    .isInstanceOf(ApiException.class)
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        @Test
+        @DisplayName("DB의 refreshToken이 만료됐으면 삭제 후 실패한다")
+        void refreshAccessToken_expired_throwsRefreshTokenExpired() {
+            // given
+            User user = user(1L, "test@example.com", "encoded-password", "neo", "/profile.png");
+            RefreshToken refreshToken = new RefreshToken(user, "refresh-token", LocalDateTime.now().minusSeconds(1));
+            given(refreshTokenRepository.findByToken("refresh-token")).willReturn(Optional.of(refreshToken));
+
+            // when & then
+            assertThatThrownBy(() -> userService.refreshAccessToken("refresh-token"))
+                    .isInstanceOf(ApiException.class)
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.REFRESH_TOKEN_EXPIRED);
+
+            verify(refreshTokenRepository).delete(refreshToken);
+            verify(jwtTokenProvider, never()).validateRefreshTokenOrThrow(any());
+        }
+
+        @Test
+        @DisplayName("JWT 검증 실패 시 refreshToken을 삭제하고 실패한다")
+        void refreshAccessToken_invalidJwt_deletesTokenAndThrows() {
+            // given
+            User user = user(1L, "test@example.com", "encoded-password", "neo", "/profile.png");
+            RefreshToken refreshToken = new RefreshToken(user, "refresh-token", LocalDateTime.now().plusDays(1));
+            given(refreshTokenRepository.findByToken("refresh-token")).willReturn(Optional.of(refreshToken));
+            doThrow(new ApiException(ErrorCode.INVALID_REFRESH_TOKEN))
+                    .when(jwtTokenProvider).validateRefreshTokenOrThrow("refresh-token");
+
+            // when & then
+            assertThatThrownBy(() -> userService.refreshAccessToken("refresh-token"))
+                    .isInstanceOf(ApiException.class)
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.INVALID_REFRESH_TOKEN);
+
+            verify(refreshTokenRepository).delete(refreshToken);
+        }
+
+        @Test
+        @DisplayName("삭제된 유저의 refreshToken이면 삭제 후 실패한다")
+        void refreshAccessToken_deletedUser_deletesTokenAndThrows() {
+            // given
+            User user = user(1L, "test@example.com", "encoded-password", "neo", "/profile.png");
+            user.delete();
+            RefreshToken refreshToken = new RefreshToken(user, "refresh-token", LocalDateTime.now().plusDays(1));
+            given(refreshTokenRepository.findByToken("refresh-token")).willReturn(Optional.of(refreshToken));
+
+            // when & then
+            assertThatThrownBy(() -> userService.refreshAccessToken("refresh-token"))
+                    .isInstanceOf(ApiException.class)
+                    .extracting("errorCode")
+                    .isEqualTo(ErrorCode.UNAUTHORIZED_USER);
+
+            verify(refreshTokenRepository).delete(refreshToken);
+            verify(jwtTokenProvider, never()).createAccessToken(any());
+        }
     }
 
     private SignUpRequestDto signUpRequest(
@@ -342,6 +647,26 @@ class UserServiceTest {
         LoginRequestDto request = new LoginRequestDto();
         ReflectionTestUtils.setField(request, "email", email);
         ReflectionTestUtils.setField(request, "password", password);
+        return request;
+    }
+
+
+    private UserUpdateRequestDto userUpdateRequest(String nickname, String profileImage) {
+        UserUpdateRequestDto request = new UserUpdateRequestDto();
+        ReflectionTestUtils.setField(request, "nickname", nickname);
+        ReflectionTestUtils.setField(request, "profileImage", profileImage);
+        return request;
+    }
+
+    private PasswordUpdateRequestDto passwordUpdateRequest(
+            String curPassword,
+            String password,
+            String passwordCheck
+    ) {
+        PasswordUpdateRequestDto request = new PasswordUpdateRequestDto();
+        ReflectionTestUtils.setField(request, "curPassword", curPassword);
+        ReflectionTestUtils.setField(request, "password", password);
+        ReflectionTestUtils.setField(request, "passwordCheck", passwordCheck);
         return request;
     }
 
